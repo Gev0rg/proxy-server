@@ -1,13 +1,14 @@
 package proxy
 
 import (
+	"github.com/Gev0rg/proxy-server/storage"
 	"io"
 	"net"
 	"net/http"
 )
 
 type Proxy struct {
-
+	Store *storage.Storage
 }
 
 func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -22,13 +23,15 @@ func (p *Proxy) HandleHttp(w http.ResponseWriter, r *http.Request) {
 	r.Header.Del("Proxy-Connection")
 	r.RequestURI = ""
 
-	// TODO: save request
+	// p.Store.SaveRequest(r)
+
 	resp, err := http.DefaultTransport.RoundTrip(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusServiceUnavailable)
 		return
 	}
-	// TODO: save response
+
+	// p.Store.SaveResponse(resp)
 
 	w.WriteHeader(resp.StatusCode)
 	copyHeader(w.Header(), resp.Header)
@@ -42,7 +45,8 @@ func (p *Proxy) HandleHttp(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *Proxy) HandleHttps(w http.ResponseWriter, r *http.Request) {
-	// TODO: save request
+	// p.Store.SaveRequest(r)
+
 	dest, err := net.Dial("tcp", r.Host)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusServiceUnavailable)
