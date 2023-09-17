@@ -1,6 +1,7 @@
 package main
 
 import (
+	// "crypto/tls"
 	"fmt"
 	"log"
 	"net/http"
@@ -20,4 +21,9 @@ func main() {
 	if err := server.ListenAndServe(); err != nil {
 		log.Fatalln(err);
 	}
+
+	// fmt.Println("Start serving HTTPS")
+	// if err := server.ListenAndServeTLS("certs/ca.crt", "certs/ca.key"); err != nil {
+	// 	log.Fatalln(err);
+	// }
 }

@@ -2,6 +2,7 @@ package proxy
 
 import (
 	"io"
+	"net"
 	"net/http"
 )
 
@@ -41,7 +42,35 @@ func (p *Proxy) HandleHttp(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *Proxy) HandleHttps(w http.ResponseWriter, r *http.Request) {
-	
+	// TODO: save request
+	dest, err := net.Dial("tcp", r.Host)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusServiceUnavailable)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+
+	hijacker, ok := w.(http.Hijacker)
+	if !ok {
+		http.Error(w, err.Error(), http.StatusServiceUnavailable)
+		return
+	}
+
+	client, _, err := hijacker.Hijack()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusServiceUnavailable)
+	}
+
+	go transfer(dest, client)
+	go transfer(client, dest)
+}
+
+func transfer(dest io.WriteCloser, src io.ReadCloser) {
+	defer dest.Close()
+	defer src.Close()
+
+	io.Copy(dest, src)
 }
 
 func copyHeader(dst, src http.Header) {
