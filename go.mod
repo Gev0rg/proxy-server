@@ -2,7 +2,10 @@ module github.com/Gev0rg/proxy-server
 
 go 1.21.1
 
-require go.mongodb.org/mongo-driver v1.12.1
+require (
+	github.com/gorilla/mux v1.8.0
+	go.mongodb.org/mongo-driver v1.12.1
+)
 
 require (
 	github.com/golang/snappy v0.0.1 // indirect

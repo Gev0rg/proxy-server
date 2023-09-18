@@ -23,7 +23,7 @@ func (p *Proxy) HandleHttp(w http.ResponseWriter, r *http.Request) {
 	r.Header.Del("Proxy-Connection")
 	r.RequestURI = ""
 
-	// p.Store.SaveRequest(r)
+	p.Store.SaveRequest(r)
 
 	resp, err := http.DefaultTransport.RoundTrip(r)
 	if err != nil {
@@ -31,7 +31,7 @@ func (p *Proxy) HandleHttp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// p.Store.SaveResponse(resp)
+	p.Store.SaveResponse(resp)
 
 	w.WriteHeader(resp.StatusCode)
 	copyHeader(w.Header(), resp.Header)
@@ -45,7 +45,7 @@ func (p *Proxy) HandleHttp(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *Proxy) HandleHttps(w http.ResponseWriter, r *http.Request) {
-	// p.Store.SaveRequest(r)
+	p.Store.SaveRequest(r)
 
 	dest, err := net.Dial("tcp", r.Host)
 	if err != nil {

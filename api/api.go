@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/Gev0rg/proxy-server/models"
-	"github.com/Gev0rg/proxy-server/proxy"
 	"github.com/Gev0rg/proxy-server/storage"
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
@@ -19,7 +18,6 @@ import (
 )
 
 type Handlers struct {
-	Proxy   proxy.Proxy
 	Storage *storage.Storage
 }
 
@@ -40,7 +38,7 @@ func Respond(w http.ResponseWriter, code int, data interface{}) {
 }
 
 func (h *Handlers) GetRequests(w http.ResponseWriter, r *http.Request) {
-	collection := h.Storage.GetClient().Database("test").Collection("requests")
+	collection := h.Storage.GetClient().Database("admin").Collection("requests")
 
 	var results []*models.ReplyRequest
 
@@ -64,7 +62,7 @@ func (h *Handlers) GetRequests(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) GetRequestByID(w http.ResponseWriter, r *http.Request) {
-	collection := h.Storage.GetClient().Database("test").Collection("requests")
+	collection := h.Storage.GetClient().Database("admin").Collection("requests")
 
 	var result models.ReplyRequest
 
@@ -82,7 +80,7 @@ func (h *Handlers) GetRequestByID(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handlers) RepeatRequest(w http.ResponseWriter, r *http.Request) {
 
-	collection := h.Storage.GetClient().Database("test").Collection("requests")
+	collection := h.Storage.GetClient().Database("admin").Collection("requests")
 
 	var result models.ReplyRequest
 
@@ -146,7 +144,7 @@ func (h *Handlers) DirSearch(w http.ResponseWriter, r *http.Request) {
 
 	var responseAnswer []Not404Response
 
-	collection := h.Storage.GetClient().Database("test").Collection("requests")
+	collection := h.Storage.GetClient().Database("admin").Collection("requests")
 
 	var result models.ReplyRequest
 

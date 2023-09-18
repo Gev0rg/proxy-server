@@ -3,7 +3,7 @@ package storage
 import (
 	"context"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 
@@ -18,7 +18,7 @@ type Storage struct {
 }
 
 func (s *Storage) Connect() {
-	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
+	clientOptions := options.Client().ApplyURI("mongodb://root:root@mongo:27017")
 
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
@@ -77,7 +77,7 @@ func (s *Storage) SaveRequest(req *http.Request) {
 		parseReq.PostParams[key] = value
 	}
 
-	collection := s.client.Database("test").Collection("requests")
+	collection := s.client.Database("admin").Collection("requests")
 
 	_, err := collection.InsertOne(context.TODO(), parseReq)
 	if err != nil {
@@ -86,25 +86,28 @@ func (s *Storage) SaveRequest(req *http.Request) {
 }
 
 func (s *Storage) SaveResponse(res *http.Response) {
-	var parseResp models.Response
-
-	parseResp.Code = res.StatusCode
-
-	parseResp.Message = res.Status
-
-	parseResp.Headers = make(map[string][]string)
+	parsedResp := models.Response{
+		Code:    res.StatusCode,
+		Message: res.Status,
+		Headers: make(map[string][]string),
+	}
+	
 	for key, value := range res.Header {
-		parseResp.Headers[key] = value
+		parsedResp.Headers[key] = value
 	}
 
-	if res.Body != nil {
-		bodyBytes, _ := ioutil.ReadAll(res.Body)
-		parseResp.Body = string(bodyBytes)
+	if res.Request.Method == http.MethodPost && res.Body != nil {
+		body, err := io.ReadAll(res.Body)
+		if err != nil {
+			panic(err)
+		}
+
+		parsedResp.Body = string(body)
 	}
 
-	collection := s.client.Database("test").Collection("responses")
+	collection := s.client.Database("admin").Collection("responses")
 
-	_, err := collection.InsertOne(context.TODO(), parseResp)
+	_, err := collection.InsertOne(context.TODO(), parsedResp)
 	if err != nil {
 		log.Fatal(err)
 	}
