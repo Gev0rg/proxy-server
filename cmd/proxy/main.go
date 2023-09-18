@@ -6,18 +6,14 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/Gev0rg/proxy-server/config"
 	"github.com/Gev0rg/proxy-server/proxy"
 	"github.com/Gev0rg/proxy-server/storage"
 )
 
 func main() {
-	defer func() {
-        if r := recover(); r != nil {
-            // Обработка ошибки паники
-            fmt.Println("Возникла паника:", r)
-        }
-    }()
-	
+	conf := config.NewConfig();
+
 	store := &storage.Storage{}
 	store.Connect()
 
@@ -30,13 +26,15 @@ func main() {
 		Addr:    ":8080",
 	}
 
-	fmt.Println("Start serving HTTP")
-	if err := server.ListenAndServe(); err != nil {
-		log.Fatalln(err)
+	if conf.HTTPS {
+		fmt.Println("Start serving TLS")
+		if err := server.ListenAndServeTLS("certs/ca.crt", "certs/ca.key"); err != nil {
+			log.Fatalln(err)
+		}
+	} else {
+		fmt.Println("Start serving HTTP")
+		if err := server.ListenAndServe(); err != nil {
+			log.Fatalln(err)
+		}
 	}
-
-	// fmt.Println("Start serving HTTPS")
-	// if err := server.ListenAndServeTLS("certs/ca.crt", "certs/ca.key"); err != nil {
-	// 	log.Fatalln(err)
-	// }
 }
