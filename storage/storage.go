@@ -91,7 +91,7 @@ func (s *Storage) SaveResponse(res *http.Response) {
 		Message: res.Status,
 		Headers: make(map[string][]string),
 	}
-	
+
 	for key, value := range res.Header {
 		parsedResp.Headers[key] = value
 	}

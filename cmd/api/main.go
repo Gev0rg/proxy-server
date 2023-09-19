@@ -9,14 +9,15 @@ import (
 	"github.com/Gev0rg/proxy-server/api"
 	"github.com/Gev0rg/proxy-server/storage"
 )
+
 func main() {
 	defer func() {
-        if r := recover(); r != nil {
-            // Обработка ошибки паники
-            fmt.Println("Возникла паника:", r)
-        }
-    }()
-	
+		if r := recover(); r != nil {
+			// Обработка ошибки паники
+			fmt.Println("Возникла паника:", r)
+		}
+	}()
+
 	store := &storage.Storage{}
 	store.Connect()
 

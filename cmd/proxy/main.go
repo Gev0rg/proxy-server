@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	conf := config.NewConfig();
+	conf := config.NewConfig()
 
 	store := &storage.Storage{}
 	store.Connect()
